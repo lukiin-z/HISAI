@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Planilha de Empresas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Gerar Planilha de Empresas</h1>
+        <button class="btn" id="generateBtn">Gerar Planilha</button>
+        <div class="input-area" id="inputArea" style="display: none;">
+            <input type="text" id="empresaInput" placeholder="Digite os nomes das empresas separados por vírgula">
+            <button class="btn" id="submitBtn">Enviar</button>
+        </div>
+        <div id="status"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
