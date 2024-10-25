@@ -1,22 +1,31 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerar Planilha de Empresas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Enviar Planilha</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/script.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>Gerar Planilha de Empresas</h1>
-        <button class="btn" id="generateBtn">Gerar Planilha</button>
-        <div class="input-area" id="inputArea" style="display: none;">
-            <input type="text" id="empresaInput" placeholder="Digite os nomes das empresas separados por vírgula">
-            <button class="btn" id="submitBtn">Enviar</button>
+        <!-- Adicionando a logo -->
+        <img src="/static/logo.png" alt="Logo HIS Logística" style="width: 150px; margin-bottom: 20px;">
+        
+        <h1>Enviar Planilha para Atualização</h1>
+        
+        <form id="upload-form" action="/upload_planilha" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Enviar Planilha</button>
+        </form>
+
+        <!-- Link para baixar a planilha atualizado será exibido aqui -->
+        <div id="download-link" style="display: none;">
+            <a href="/download_planilha">Baixar Planilha Atualizada</a>
         </div>
+
+        <!-- Campo para exibir status -->
         <div id="status"></div>
     </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

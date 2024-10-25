@@ -1,23 +1,24 @@
-document.getElementById('generateBtn').addEventListener('click', function() {
-    document.getElementById('inputArea').style.display = 'block';
-});
+document.getElementById('upload-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Evita o envio padrão do formulário
 
-document.getElementById('submitBtn').addEventListener('click', function() {
-    const empresas = document.getElementById('empresaInput').value;
-    document.getElementById('status').innerText = "Gerando planilha, por favor aguarde...";
+    const formData = new FormData(this);
 
-    fetch('/gerar_planilha', {
+    fetch('/upload_planilha', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ empresas: empresas })
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('status').innerHTML = `<a href="${data.link}" download>Baixar Planilha</a>`;
+        if (data.link) {
+            // Exibe o link de download e oculta o botão de envio
+            document.getElementById('download-link').style.display = 'block';
+            document.getElementById('status').innerText = "Planilha gerada com sucesso!";
+        } else {
+            document.getElementById('status').innerText = "Erro ao gerar a planilha.";
+        }
     })
     .catch(error => {
         document.getElementById('status').innerText = "Erro ao gerar a planilha.";
+        console.error('Erro:', error);
     });
 });
