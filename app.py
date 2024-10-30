@@ -8,7 +8,7 @@ import os
 
 app = Flask(__name__)
 
-API_KEY = 'AIzaSyAcpQSjzuKevs_Ieh39YJEKMv33iIVRyWw'
+API_KEY = 'SUA-API-AQUI'
 
 # Função para buscar o place_id e outros detalhes via Google Places API
 def buscar_empresa_google(nome_empresa):
