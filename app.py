@@ -118,6 +118,7 @@ def upload_planilha():
 
     file = request.files['file']
 
+    # Criar o diretório uploads se não existir
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
     
@@ -127,6 +128,9 @@ def upload_planilha():
     planilha = gerar_planilha_com_dados(file_path)
     os.remove(file_path)
 
+    # Garantir que o diretório para salvar o arquivo existe
+    os.makedirs(os.path.dirname(os.path.abspath('planilha_atualizada.xlsx')), exist_ok=True)
+    
     with open('planilha_atualizada.xlsx', 'wb') as f:
         f.write(planilha.getbuffer())
     
@@ -136,5 +140,8 @@ def upload_planilha():
 def download_planilha():
     return send_file('planilha_atualizada.xlsx', as_attachment=True, download_name='empresas_atualizadas.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
+# Modificação para produção no Render
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Verifica se estamos em ambiente de produção
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
