@@ -1,31 +1,442 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enviar Planilha</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <script src="/static/script.js" defer></script>
+    <title>HIS Logística - Atualização de Planilhas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #004494;
+            --accent-color: #28a745;
+            --accent-hover: #218838;
+            --light-bg: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e8edf5 100%);
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 180px;
+            height: auto;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
+        }
+
+        h1 {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .upload-section {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px dashed #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-color);
+        }
+
+        .upload-section.drag-over {
+            background-color: #eef7ff;
+            border-color: var(--primary-color);
+        }
+
+        .file-input-container {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+            word-break: break-all;
+            max-width: 100%;
+            display: none;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-download {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0, 86, 179, 0.2);
+        }
+
+        .btn-download:hover {
+            background-color: var(--secondary-color);
+            box-shadow: 0 6px 12px rgba(0, 86, 179, 0.3);
+        }
+
+        .download-section {
+            margin-top: 30px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .status.loading {
+            background-color: #e9ecef;
+            color: #495057;
+            border-left: 4px solid #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Responsividade */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 25px;
+            }
+            
+            .upload-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Adicionando a logo -->
-        <img src="/static/logo.png" alt="Logo HIS Logística" style="width: 150px; margin-bottom: 20px;">
+        <div class="logo-container">
+            <img src="/static/logo.png" alt="Logo HIS Logística" class="logo">
+        </div>
         
-        <h1>Enviar Planilha para Atualização</h1>
+        <h1>Atualização de Planilhas</h1>
         
-        <form id="upload-form" action="/upload_planilha" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <button type="submit">Enviar Planilha</button>
-        </form>
-
-        <!-- Link para baixar a planilha atualizado será exibido aqui -->
-        <div id="download-link" style="display: none;">
-            <a href="/download_planilha">Baixar Planilha Atualizada</a>
+        <div class="upload-section" id="upload-area">
+            <form id="upload-form" action="/upload_planilha" method="POST" enctype="multipart/form-data">
+                <div class="file-input-container">
+                    <input type="file" name="file" id="file-input" class="file-input" accept=".xlsx,.xls,.csv">
+                    <label for="file-input" class="file-input-label">
+                        <i class="fas fa-file-excel file-icon"></i>
+                        <span class="file-text">Clique aqui ou arraste sua planilha</span>
+                        <span id="file-name" class="file-name"></span>
+                    </label>
+                </div>
+                <button type="submit" class="btn" id="upload-btn" disabled>
+                    <i class="fas fa-upload"></i> Enviar Planilha
+                </button>
+            </form>
         </div>
 
-        <!-- Campo para exibir status -->
-        <div id="status"></div>
+        <div id="status" class="status"></div>
+
+        <div id="download-section" class="download-section">
+            <button id="download-btn" class="btn btn-download">
+                <i class="fas fa-download"></i> Baixar Planilha Atualizada
+            </button>
+        </div>
+
+        <footer>
+            <p>© 2025 HIS Logística - Todos os direitos reservados</p>
+        </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            const uploadBtn = document.getElementById('upload-btn');
+            const uploadForm = document.getElementById('upload-form');
+            const status = document.getElementById('status');
+            const downloadSection = document.getElementById('download-section');
+            const downloadBtn = document.getElementById('download-btn');
+            const uploadArea = document.getElementById('upload-area');
+
+            // Mostrar nome do arquivo selecionado
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    fileName.textContent = this.files[0].name;
+                    fileName.style.display = 'block';
+                    uploadBtn.disabled = false;
+                } else {
+                    fileName.textContent = '';
+                    fileName.style.display = 'none';
+                    uploadBtn.disabled = true;
+                }
+            });
+
+            // Funcionalidade de arrastar e soltar
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadArea.classList.add('drag-over');
+            }
+
+            function unhighlight() {
+                uploadArea.classList.remove('drag-over');
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files && files[0]) {
+                    fileInput.files = files;
+                    fileName.textContent = files[0].name;
+                    fileName.style.display = 'block';
+                    uploadBtn.disabled = false;
+                }
+            }
+
+            // Envio do formulário com feedback
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!fileInput.files || !fileInput.files[0]) {
+                    showStatus('Por favor, selecione um arquivo primeiro.', 'error');
+                    return;
+                }
+
+                // Mostrar status de carregamento
+                showStatus('<div class="loader"></div> Processando planilha...', 'loading');
+                
+                // Criar FormData para envio do arquivo
+                const formData = new FormData(this);
+                
+                // Enviar o formulário via AJAX
+                fetch('/upload_planilha', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    // Verificar se a resposta foi bem-sucedida (pode ter código 200 mesmo com erro no processamento)
+                    return response.text().then(text => {
+                        try {
+                            // Tentar converter o texto para JSON
+                            return JSON.parse(text);
+                        } catch (e) {
+                            // Se não for JSON, verificar se contém texto de erro
+                            if (text.toLowerCase().includes('erro') || text.toLowerCase().includes('error')) {
+                                throw new Error(text);
+                            }
+                            // Se não houver erro explícito, consideramos sucesso
+                            return { success: true };
+                        }
+                    });
+                })
+                .then(data => {
+                    // Verificar se a resposta contém um indicador de sucesso ou erro
+                    if (data && (data.success === true || !data.error)) {
+                        showStatus('Planilha processada com sucesso!', 'success');
+                        downloadSection.style.display = 'block';
+                    } else {
+                        // Se tiver mensagem de erro explícita, exibi-la
+                        showStatus(data.message || data.error || 'Erro ao processar planilha.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    showStatus('Ocorreu um erro ao processar a planilha: ' + error.message, 'error');
+                });
+            });
+
+            // Download da planilha atualizada
+            downloadBtn.addEventListener('click', function() {
+                window.location.href = '/download_planilha';
+            });
+
+            // Função para mostrar status
+            function showStatus(message, type) {
+                status.innerHTML = message;
+                status.className = 'status ' + type;
+                status.style.display = 'block';
+                
+                // Ocultar mensagem após alguns segundos (exceto se for erro)
+                if (type !== 'error' && type !== 'loading') {
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                    }, 5000);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
