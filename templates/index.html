@@ -58,6 +58,58 @@
             filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
         }
 
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-info h1 {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .header-info p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-actions a {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-admin {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .btn-admin:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-logout {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background-color: #c82333;
+        }
+
         h1 {
             font-size: 28px;
             color: var(--primary-color);
@@ -169,6 +221,11 @@
             box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn i {
             margin-right: 8px;
         }
@@ -183,10 +240,72 @@
             box-shadow: 0 6px 12px rgba(0, 86, 179, 0.3);
         }
 
+        .btn-pdf {
+            background-color: #dc3545;
+            box-shadow: 0 4px 6px rgba(220, 53, 69, 0.2);
+        }
+
+        .btn-pdf:hover {
+            background-color: #c82333;
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .stats-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stats-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
         .download-section {
             margin-top: 30px;
             display: none;
             animation: fadeIn 0.5s ease;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .status {
@@ -238,13 +357,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         footer {
             margin-top: 30px;
             color: #777;
             font-size: 14px;
         }
 
-        /* Responsividade */
         @media screen and (max-width: 768px) {
             .container {
                 width: 95%;
@@ -255,12 +378,25 @@
                 padding: 20px;
             }
             
-            h1 {
+            .header-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-info h1 {
                 font-size: 24px;
             }
             
             .btn {
                 width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .download-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -271,7 +407,22 @@
             <img src="/static/logo.png" alt="Logo HIS Logística" class="logo">
         </div>
         
-        <h1>Atualização de Planilhas</h1>
+        <div class="header-section">
+            <div class="header-info">
+                <h1>Atualização de Planilhas</h1>
+                <p>Bem-vindo, <strong>{{ user.username }}</strong></p>
+            </div>
+            <div class="header-actions">
+                {% if user.is_admin %}
+                <a href="/admin" class="btn-admin">
+                    <i class="fas fa-shield-alt"></i> Admin
+                </a>
+                {% endif %}
+                <a href="/logout" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
         
         <div class="upload-section" id="upload-area">
             <form id="upload-form" action="/upload_planilha" method="POST" enctype="multipart/form-data">
@@ -289,12 +440,35 @@
             </form>
         </div>
 
+        <div id="stats-box" class="stats-box">
+            <div class="stats-title">📊 Resultados do Processamento</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-total">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-found">0</span>
+                    <span class="stat-label">✅ Encontrados</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-notfound">0</span>
+                    <span class="stat-label">❌ Removidos</span>
+                </div>
+            </div>
+        </div>
+
         <div id="status" class="status"></div>
 
         <div id="download-section" class="download-section">
-            <button id="download-btn" class="btn btn-download">
-                <i class="fas fa-download"></i> Baixar Planilha Atualizada
-            </button>
+            <div class="download-buttons">
+                <button id="download-excel-btn" class="btn btn-download">
+                    <i class="fas fa-file-excel"></i> Baixar Excel Completo
+                </button>
+                <button id="download-pdf-btn" class="btn btn-pdf">
+                    <i class="fas fa-file-pdf"></i> Baixar PDF Profissional
+                </button>
+            </div>
         </div>
 
         <footer>
@@ -310,10 +484,12 @@
             const uploadForm = document.getElementById('upload-form');
             const status = document.getElementById('status');
             const downloadSection = document.getElementById('download-section');
-            const downloadBtn = document.getElementById('download-btn');
+            const downloadExcelBtn = document.getElementById('download-excel-btn');
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
             const uploadArea = document.getElementById('upload-area');
+            const statsBox = document.getElementById('stats-box');
 
-            // Mostrar nome do arquivo selecionado
+            // Mostrar nome do arquivo
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     fileName.textContent = this.files[0].name;
@@ -326,7 +502,7 @@
                 }
             });
 
-            // Funcionalidade de arrastar e soltar
+            // Drag and drop
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 uploadArea.addEventListener(eventName, preventDefaults, false);
             });
@@ -366,7 +542,7 @@
                 }
             }
 
-            // Envio do formulário com feedback
+            // Envio do formulário
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -375,42 +551,35 @@
                     return;
                 }
 
-                // Mostrar status de carregamento
+                // Oculta seções anteriores
+                statsBox.style.display = 'none';
+                downloadSection.style.display = 'none';
+
                 showStatus('<div class="loader"></div> Processando planilha...', 'loading');
                 
-                // Criar FormData para envio do arquivo
                 const formData = new FormData(this);
                 
-                // Enviar o formulário via AJAX
                 fetch('/upload_planilha', {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    // Verificar se a resposta foi bem-sucedida (pode ter código 200 mesmo com erro no processamento)
-                    return response.text().then(text => {
-                        try {
-                            // Tentar converter o texto para JSON
-                            return JSON.parse(text);
-                        } catch (e) {
-                            // Se não for JSON, verificar se contém texto de erro
-                            if (text.toLowerCase().includes('erro') || text.toLowerCase().includes('error')) {
-                                throw new Error(text);
-                            }
-                            // Se não houver erro explícito, consideramos sucesso
-                            return { success: true };
-                        }
-                    });
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // Verificar se a resposta contém um indicador de sucesso ou erro
-                    if (data && (data.success === true || !data.error)) {
-                        showStatus('Planilha processada com sucesso!', 'success');
-                        downloadSection.style.display = 'block';
-                    } else {
-                        // Se tiver mensagem de erro explícita, exibi-la
-                        showStatus(data.message || data.error || 'Erro ao processar planilha.', 'error');
+                    if (data.error) {
+                        showStatus(data.error, 'error');
+                        return;
                     }
+
+                    // Mostra estatísticas
+                    if (data.stats) {
+                        document.getElementById('stat-total').textContent = data.stats.total;
+                        document.getElementById('stat-found').textContent = data.stats.encontrados;
+                        document.getElementById('stat-notfound').textContent = data.stats.nao_encontrados;
+                        statsBox.style.display = 'block';
+                    }
+
+                    showStatus('✅ Planilha processada com sucesso! Excel e PDF disponíveis para download.', 'success');
+                    downloadSection.style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Erro:', error);
@@ -418,9 +587,13 @@
                 });
             });
 
-            // Download da planilha atualizada
-            downloadBtn.addEventListener('click', function() {
-                window.location.href = '/download_planilha';
+            // Downloads
+            downloadExcelBtn.addEventListener('click', function() {
+                window.location.href = '/download_excel';
+            });
+
+            downloadPdfBtn.addEventListener('click', function() {
+                window.location.href = '/download_pdf';
             });
 
             // Função para mostrar status
@@ -429,7 +602,6 @@
                 status.className = 'status ' + type;
                 status.style.display = 'block';
                 
-                // Ocultar mensagem após alguns segundos (exceto se for erro)
                 if (type !== 'error' && type !== 'loading') {
                     setTimeout(() => {
                         status.style.display = 'none';
