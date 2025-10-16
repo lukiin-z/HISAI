@@ -20,8 +20,8 @@ from database import db, User, UploadHistory, init_db, can_add_user
 app = Flask(__name__)
 
 # ========== CONFIGURAÇÕES ==========
-app.config['SECRET_KEY'] = 'AIzaSyAbfZN5HQv_JX0nQTPoasOWt6iMWB3dvNE'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hislogistica.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-change-in-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///hislogistica.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_db(app)
@@ -36,7 +36,8 @@ login_manager.login_message_category = 'warning'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-API_KEY = 'AIzaSyAbfZN5HQv_JX0nQTPoasOWt6iMWB3dvNE'
+# Pega API Key do ambiente ou usa a padrão (MUDE NO RENDER!)
+API_KEY = os.environ.get('GOOGLE_API_KEY', 'AIzaSyAbfZN5HQv_JX0nQTPoasOWt6iMWB3dvNE')
 
 # ========== FUNÇÃO DE BUSCA ULTRA COMPLETA ==========
 def buscar_empresa_google(nome_empresa):
