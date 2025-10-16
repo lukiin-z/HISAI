@@ -391,6 +391,10 @@ def logout():
 def index():
     return render_template('index.html', user=current_user)
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_file('static/logo.png', mimetype='image/png')
+
 # ========== UPLOAD E DOWNLOAD ==========
 @app.route('/upload_planilha', methods=['POST'])
 @login_required
@@ -531,5 +535,9 @@ def delete_user(user_id):
     return jsonify({'success': True, 'message': 'Usuário deletado!'})
 
 if __name__ == '__main__':
+    # Cria diretórios necessários
+    os.makedirs('uploads', exist_ok=True)
+    os.makedirs('temp', exist_ok=True)
+    
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)

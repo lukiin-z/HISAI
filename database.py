@@ -73,20 +73,32 @@ def init_db(app):
     """
     db.init_app(app)
     with app.app_context():
+        # Importa todos os modelos antes de criar tabelas
+        from database import User, UploadHistory
+        
+        # Cria todas as tabelas
         db.create_all()
         
+        print("✅ Tabelas do banco de dados criadas/verificadas!")
+        
         # Cria usuário admin padrão se não existir
-        admin = User.query.filter_by(username='admin').first()
-        if not admin:
-            admin = User(
-                username='admin',
-                email='admin@hislogistica.com.br',
-                is_admin=True
-            )
-            admin.set_password('admin123')  # MUDE ESSA SENHA DEPOIS!
-            db.session.add(admin)
-            db.session.commit()
-            print("✅ Usuário admin criado! Login: admin | Senha: admin123")
+        try:
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(
+                    username='admin',
+                    email='admin@hislogistica.com.br',
+                    is_admin=True
+                )
+                admin.set_password('admin123')  # MUDE ESSA SENHA DEPOIS!
+                db.session.add(admin)
+                db.session.commit()
+                print("✅ Usuário admin criado! Login: admin | Senha: admin123")
+            else:
+                print("✅ Usuário admin já existe!")
+        except Exception as e:
+            print(f"⚠️  Erro ao criar admin: {e}")
+            db.session.rollback()
         
         print("✅ Banco de dados inicializado!")
 
